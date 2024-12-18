@@ -6,7 +6,7 @@
 
 # Скрипты
 ## Создание таблиц БД
-```postgresql
+```pgsql
 CREATE TABLE "User"
 (
     "ID"       SERIAL PRIMARY KEY,
@@ -117,7 +117,7 @@ CREATE TABLE "BlackListUsers"
 ```
 
 ## Заполнение тестовыми данными
-```postgresql
+```pgsql
 INSERT INTO "User" ("name", "email", "password", "role")
 VALUES ('Alice Smith', 'alice.smith@example.com', 'password123', 'organizer'),
        ('Bob Johnson', 'bob.johnson@example.com', 'securepass', 'participant'),
@@ -167,7 +167,7 @@ VALUES (3, 'Spamming during the event.');
 
 
 ## Удаление таблиц БД
-```postgresql
+```pgsql
 DROP TABLE IF EXISTS "BlackListUsers" CASCADE;
 DROP TABLE IF EXISTS "OrganizerStats" CASCADE;
 DROP TABLE IF EXISTS "Feedback" CASCADE;
@@ -184,7 +184,7 @@ DROP TABLE IF EXISTS "User" CASCADE;
 
 ## Триггеры
 ### Автоматическое обновление статистики организаторов
-```postgresql
+```pgsql
 CREATE OR REPLACE FUNCTION update_participants_count()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -202,7 +202,7 @@ EXECUTE FUNCTION update_participants_count();
 ```
 
 ### Автоматический пересчёт среднего рейтинга
-```postgresql
+```pgsql
 CREATE OR REPLACE FUNCTION update_medium_rating()
 RETURNS TRIGGER AS $$
 BEGIN
