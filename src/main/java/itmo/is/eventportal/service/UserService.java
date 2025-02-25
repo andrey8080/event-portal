@@ -115,4 +115,14 @@ public class UserService {
 		}
 		return email;
 	}
+
+	public String getUserRole(String token) {
+		String email = extractEmail(token);
+		if (email == null) {
+			return null;
+		}
+
+		User user = getUserByEmail(email);
+		return user.getStringRole();
+	}
 }

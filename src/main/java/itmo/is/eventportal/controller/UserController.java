@@ -55,6 +55,9 @@ public class UserController {
 
 	@PutMapping("/update")
 	public ResponseEntity<?> updateData(@RequestHeader("Authorization") String token, @RequestBody User formData) {
+		if (!userService.checkValidToken(token)) {
+			return ResponseEntity.status(401).body("{\"error\":\"Неверный или просроченный токен\"}");
+		}
 		String emailFromToken = userService.extractEmail(token);
 		User user = userService.getUserByEmail(emailFromToken);
 		if (user == null) {
@@ -77,20 +80,35 @@ public class UserController {
 	}
 
 	@DeleteMapping("/delete")
-	public ResponseEntity<?> deleteAccount(@RequestHeader("Authorization") String token) {
-		String email = userService.extractEmail(token);
+	public ResponseEntity<?> deleteAccount(@RequestHeader("Authorization") String token, @RequestParam String email) {
+		if (token == null) {
+			return ResponseEntity.status(401).body("{\"error\":\"Неверный или просроченный токен\"}");
+		}
+		if (!userService.checkValidToken(token)) {
+			return ResponseEntity.status(401).body("{\"error\":\"Неверный или просроченный токен\"}");
+		}
+		String emailFromToken = userService.extractEmail(token);
+		User user = userService.getUserByEmail(emailFromToken);
+		if (user == null) {
+			return ResponseEntity.status(401).body("{\"error\":\"Неверный или просроченный токен\"}");
+		}
+		UserRole role = user.getRole();
+		if (!role.equals(UserRole.ADMIN)) {
+			return ResponseEntity.status(403).body("{\"error\":\"Недостаточно прав для удаления аккаунта\"}");
+		}
 		userService.deleteUserByEmail(email);
 		return ResponseEntity.ok("{\"message\":\"Аккаунт успешно удален\"}");
 	}
 
 	@PostMapping("/verify-token")
 	public ResponseEntity<?> checkToken(@RequestHeader("Authorization") String token) {
-		String email = userService.extractEmail(token);
-		User user = userService.getUserByEmail(email);
-		if (user == null) {
-			return ResponseEntity.status(401).body("{\"error\":\"Неверный или просроченный токен\"}");
+		if (token == null) {
+			return ResponseEntity.status(401).body("{\"error\":\"Null token\"}");
 		}
-		UserRole role = user.getRole();
+		if (!userService.checkValidToken(token)) {
+			return ResponseEntity.status(401).body("{\"error\":\"Invalid or expired token\"}");
+		}
+		String role = userService.getUserRole(token);
 		return ResponseEntity.ok("{\"role\":\"" + role + "\"}");
 	}
 }
